@@ -1,8 +1,8 @@
 from django.urls import path
-from .views import group_distribution
+from .views import ProductAPI
 
 app_name='school'
 
 urlpatterns = [
-    path('', group_distribution, name='list'),
+    path('', ProductAPI.as_view(), name='list'),
 ]

@@ -1,6 +1,11 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render
+from django.views.generic.list import ListView
 from .models import Product, Student, User, GroupStudents
 
+
+class ProductAPI(ListView):
+    model = Product
+    
 
 def group_distribution(request, id=1):
     product = Product.objects.get(id=id)
@@ -10,7 +15,7 @@ def group_distribution(request, id=1):
     student = request.user.student.get()
     groups = product.group.all()
     distribution(student, groups)
-    
+
     if not product.start and students_count(groups, product.min_students):
         rebuild_groups(groups)
 
@@ -35,11 +40,11 @@ def parsing(groups):
     group_list = []
     for group in groups:
         group_list.append(group)
-        for students in group.students.all():
-            for student in students:
-                student_list.append(student)
+        for student in group.students.all():
+            student_list.append(student)
         group.students.clear()
     return student_list, group_list
+
 
 def students_count(groups, min_students):
     students = 0
@@ -50,4 +55,3 @@ def students_count(groups, min_students):
     if students >= min_count_groups:
         return True
     return False
-
