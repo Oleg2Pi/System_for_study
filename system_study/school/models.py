@@ -12,6 +12,7 @@ class Product(models.Model):
     name = models.CharField(max_length=250)
     slug = models.SlugField(max_length=250)
     created = models.DateTimeField(auto_now_add=True)
+    start = models.BooleanField(default=False)
     price = models.FloatField(
         default=0.0,
         validators=[MinValueValidator(0.0)]
@@ -21,12 +22,6 @@ class Product(models.Model):
 
     def __str__(self) -> str:
         return self.name
-    
-    def access(self, student):
-        for group in self.group.all():
-            if student in group.get_students():
-                return True
-        return False
 
 
 class Lesson(models.Model):
