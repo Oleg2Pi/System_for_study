@@ -1,11 +1,6 @@
 from django.shortcuts import render
-from django.views.generic.list import ListView
 from .models import Product, Student, User, GroupStudents
 
-
-class ProductAPI(ListView):
-    model = Product
-    
 
 def group_distribution(request, id=1):
     product = Product.objects.get(id=id)
