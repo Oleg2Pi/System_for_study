@@ -11,6 +11,8 @@ class Product(models.Model):
     )
     name = models.CharField(max_length=250)
     slug = models.SlugField(max_length=250)
+    about = models.TextField()
+    can_buy = models.BooleanField(default=False)
     created = models.DateTimeField(auto_now_add=True)
     start = models.BooleanField(default=False)
     price = models.FloatField(
@@ -19,6 +21,7 @@ class Product(models.Model):
     )
     min_students = models.IntegerField(default=1)
     max_students = models.IntegerField(default=2)
+    lessons = models.IntegerField(default=0)
 
     def __str__(self) -> str:
         return self.name

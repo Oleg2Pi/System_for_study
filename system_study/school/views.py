@@ -1,8 +1,46 @@
 from django.shortcuts import render
-from .models import Product, Student, User, GroupStudents
+from rest_framework import generics
+from rest_framework.views import APIView
+from rest_framework.response import Response
+# from .serializers import ProductSerializer
+from .models import Product, Student, User, Group
 
 
-def group_distribution(request, id=1):
+# class ProductAPIView(generics.ListAPIView):
+#     queryset = Product.objects.filter(can_buy=True)
+#     serializer_class = ProductSerializer
+
+class ProductAPIView(APIView):
+    def get(self, requests):
+        products = Product.objects.filter(can_buy=True)
+        count_lessons(products)
+        products_values = products.values()
+        return Response({
+            'products': list(products_values)
+        })
+
+
+def count_lessons(products):
+    for product in products:
+        if product.lessons != product.lesson.all().count():
+            product.lessons = product.lesson.all().count()
+            product.save()
+
+
+class LessonsAPIView(APIView):
+    def get(self, requests):
+        student = requests.user.student.get()
+        group = Group.objects.get(students=student)
+        product = group.product
+        lessons = list(product.lesson.all().values())
+        return Response({'student': student.student.username,
+                         'group': group.name,
+                         'product': product.name,
+                         'lessons': lessons
+                         })
+
+
+def group_distribution(request, id):
     product = Product.objects.get(id=id)
 
     if not request.user.student.exists():
