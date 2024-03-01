@@ -92,11 +92,11 @@ def group_distribution(request, id):
         return 'Not exist a student'
     student = request.user.student.get()
     groups = product.group.all()
-    distribution(student, groups)
+    distribution(student, groups) # добавления студентов в группы по мере наполнения самих групп до максимума
 
     if not product.start and students_count(groups, product.min_students):
-        rebuild_groups(groups)
-
+        rebuild_groups(groups) # если в продукт не начат и количество студентов >= сумме минимального количества по группам, то начинаем перераспределение
+                               # с возможным отличием в количества на 1 человека
 
 def distribution(student, groups):
     for group in groups:
