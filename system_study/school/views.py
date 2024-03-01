@@ -10,6 +10,7 @@ from .models import Product, Student, User, Group
 #     queryset = Product.objects.filter(can_buy=True)
 #     serializer_class = ProductSerializer
 
+# API на список продуктов
 class ProductAPIView(APIView):
     def get(self, requests):
         products = Product.objects.filter(can_buy=True)
@@ -26,6 +27,8 @@ def count_lessons(products):
             product.lessons = product.lesson.all().count()
             product.save()
 
+# API для вывода списка уроков по конкретному продукту к которому пользователь имеет доступ
+
 
 class LessonsAPIView(APIView):
     def get(self, requests):
@@ -38,6 +41,48 @@ class LessonsAPIView(APIView):
                          'product': product.name,
                          'lessons': lessons
                          })
+
+# API для отображения статистики по продуктам
+
+
+class ProductAPIListView(APIView):
+    def get(self, requests):
+        products = Product.objects.all()
+        dict_products = dict()
+        for product in products:
+            product_name = product.name
+            students = count_students(product)
+            precent_full = str(count_precent_groups(
+                product, students)) + ' % from 100%'
+            all_students_platform = Student.objects.all().count()
+            precent_buy_product = str(
+                round(students / all_students_platform * 100)) + ' % from 100%'
+            dict_products[product_name] = {
+                'number of students working on the product': students,
+                'max students in products': product.max_students,
+                'what % are the groups filled': precent_full,
+                'Product purchase percentage': precent_buy_product
+            }
+        return Response({
+            'products': dict_products
+        })
+
+
+def count_students(product):
+    students = 0
+    for group in product.group.all():
+        students += group.students.all().count()
+    return students
+
+
+def count_precent_groups(product, students):
+    max_students_groups = product.group.all().count() * product.max_students
+    if max_students_groups > 0:
+        return students / max_students_groups * 100
+    else:
+        return 0
+
+# Распределение студентов по группам
 
 
 def group_distribution(request, id):
